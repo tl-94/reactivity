@@ -5,7 +5,7 @@ let activeEffect
 // effect 栈
 const effectStack = [] // 新增
 
-function effect(fn) {
+export function effect(fn) {
     const effectFn = () => {
         cleanup(effectFn)
         // 当调用 effect 注册副作用函数时，将副作用函数复制给 activeEffect 
@@ -24,7 +24,7 @@ function effect(fn) {
 }
 
 
-function track(target, key) {
+export function track(target, key) {
     // 没有 activeEffect，直接 return 
     if (!activeEffect) return
     let depsMap = bucket.get(target)
@@ -43,7 +43,7 @@ function track(target, key) {
 }
 
 
-function trigger(target, key) {
+export function trigger(target, key) {
     const depsMap = bucket.get(target)
     if (!depsMap) return
     const effects = depsMap.get(key)
@@ -113,27 +113,29 @@ function reactive(data) {
             // effects && effects.forEach(fn => fn())
 
             trigger(target, key)
+            //代表设置成功
+            return true
         }
     })
 }
 
-const state = reactive({
-    ok: true,
-    text: 2222
-})
+// const state = reactive({
+//     ok: true,
+//     text: 2222
+// })
 
-effect(() => {
-    if(state.ok){
-        console.log("effect ok is true; text: is", state.text)
-    }
-    console.log(state.ok,"effect")
-})
+// effect(() => {
+//     if(state.ok){
+//         console.log("effect ok is true; text: is", state.text)
+//     }
+//     console.log(state.ok,"effect")
+// })
 
-setTimeout(() => {
-    state.ok = false
-}, 2000)
+// setTimeout(() => {
+//     state.ok = false
+// }, 2000)
 
 
-setTimeout(() => {
-    state.text = 3
-}, 5000)
+// setTimeout(() => {
+//     state.text = 3
+// }, 5000)
