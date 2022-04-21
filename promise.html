@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        let p = new Promise((res, rej) => {
+            rej(200);
+        })
+        setTimeout(() => {
+            p.catch((e) => console.log(e, "catch"))
+        }, 1000)
+        window.addEventListener("unhandledrejection", (e) => {
+            console.log("unhandledrejection", e.promise)
+        })
+        console.log(p)
+        window.addEventListener("rejectionhandled", (e) => {
+            console.log("rejectionhandled", e)
+        })
+    </script>
+</body>
+</html>
