@@ -1,4 +1,4 @@
-import { effect } from './effct-lazy.js'
+import { effect } from '../demo3/effect-2-lazy.js'
 
 export function computed(getter) {
     //希望不立即执行，使用了再执行 获得结果

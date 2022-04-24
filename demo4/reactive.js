@@ -1,4 +1,4 @@
-import { track, trigger } from './effct-lazy.js'
+import { track, trigger } from '../effct-lazy.js'
 
 
 

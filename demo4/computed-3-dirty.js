@@ -1,4 +1,4 @@
-import { track, trigger, effect } from './effct-lazy.js'
+import { track, trigger, effect } from '../effct-lazy.js'
 
 export function computed(getter) {
     let value

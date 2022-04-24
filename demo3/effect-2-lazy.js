@@ -8,14 +8,14 @@ const effectStack = []
 export function effect(fn, options) {
     const effectFn = () => {
         cleanup(effectFn)
-        // 当调用 effect 注册副作用函数时，将副作用函数复制给 activeEffect 
         activeEffect = effectFn
-        // 在调用副作用函数之前将当前副作用函数压入栈中
         effectStack.push(effectFn)
-        fn()
-        // 在当前副作用函数执行完毕后，将当前副作用函数弹出栈，并把 activeEffect 还原为之前的值
+        //记住副作用函数的返回值
+        let res = fn()
         effectStack.pop()
         activeEffect = effectStack[effectStack.length - 1]
+        //作为effectFn的运行结果
+        return res;
     }
     // activeEffect.deps 用来存储所有与该副作用函数相关的依赖集合
     effectFn.deps = []
@@ -30,12 +30,18 @@ export function effect(fn, options) {
 const state = reactive({
     foo: 1
 })
-effect(() => {
-    console.log("a lazy effct run",state.foo)
+const effectFn = effect(() => {
+    console.log("a lazy effect run",state.foo)
+    return "eeeee"
 }, {
     lazy:true, // false
 })
-state.foo = 2
+//手动执行
+// const res = effectFn();
+// console.log("effect res",res)
+
+// state.foo = 2
+// state.foo = 3
 
 export function track(target, key) {
     // 没有 activeEffect，直接 return 
@@ -73,7 +79,7 @@ export function trigger(target, key) {
             effectFn.options.scheduler(effectFn) // 新增
         } else {
             // 否则直接执行副作用函数（之前的默认行为）
-            effectFn() // 新增
+            effectFn()
         }
     })
 }
@@ -107,24 +113,3 @@ export function reactive(data) {
         }
     })
 }
-
-// const state = reactive({
-//     ok: true,
-//     text: 2222
-// })
-
-// effect(() => {
-//     if(state.ok){
-//         console.log("effect ok is true; text: is", state.text)
-//     }
-//     console.log(state.ok,"effect")
-// })
-
-// setTimeout(() => {
-//     state.ok = false
-// }, 2000)
-
-
-// setTimeout(() => {
-//     state.text = 3
-// }, 5000)

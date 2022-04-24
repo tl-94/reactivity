@@ -1,6 +1,5 @@
-import { computed } from "./computed-1-init.js";
+import { computed } from "./computed-2-manual.js";
 import { reactive,effect } from "../demo3/effect-2-lazy.js";
-// import { effect } from '../effct-lazy.js'
 
 const state1 = reactive({
     foo: "foo"
@@ -15,9 +14,6 @@ const comp = computed(() => {
     console.log('computed run')
     return state1.foo + state2.bar
 })
-
-//2.触发computed执行
-// console.log(comp.value,"access computed value")
 
 
 //3.在一个副作用函数内实现computed的值

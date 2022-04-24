@@ -1,4 +1,4 @@
-import { reactive } from "../demo2/reactive.js";
+import { reactive } from "./demo4/reactive.js";
 
 const bucket = new WeakMap()
 
@@ -57,22 +57,22 @@ export function effect(fn, options) {
      return effectFn // 新增
 
 }
-const state = reactive({
-    foo: 1
-})
-effect(() => {
-    console.log("a lazy effct run", state.foo)
-}, {
-    lazy:true, // false
-    scheduler(fn) {
-        // fn()
-        // 每次调度时，将副作用函数添加到 jobQueue 队列中
-        jobQueue.add(fn)
-        // 调用 flushJob 刷新队列
-        flushJob()
-    }
-})
-state.foo = 2
+// const state = reactive({
+//     foo: 1
+// })
+// effect(() => {
+//     console.log("a lazy effct run", state.foo)
+// }, {
+//     lazy:true, // false
+//     scheduler(fn) {
+//         // fn()
+//         // 每次调度时，将副作用函数添加到 jobQueue 队列中
+//         jobQueue.add(fn)
+//         // 调用 flushJob 刷新队列
+//         flushJob()
+//     }
+// })
+// state.foo = 2
 // state.foo = 3
 
 
@@ -118,6 +118,7 @@ export function trigger(target, key) {
             effectFn() // 新增
         }
     })
+    // effects && effects.forEach(effectFn => effectFn()) 
 }
 
 

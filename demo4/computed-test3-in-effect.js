@@ -1,6 +1,6 @@
-import { computed } from "./computed-2.js";
+import { computed } from "./computed-2-dirty.js";
 import { reactive } from "./reactive.js";
-import { effect } from './effct-lazy.js'
+import { effect } from '../effct-lazy.js'
 
 const state1 = reactive({
     foo: "foo"
@@ -12,7 +12,7 @@ const state2 = reactive({
 
 //1.如果没用到computed的值 则不运行
 const comp = computed(() => {
-    console.log('computed run')
+    console.log('computed run calc')
     return state1.foo + state2.bar
 })
 
