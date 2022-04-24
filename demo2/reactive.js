@@ -1,4 +1,4 @@
-import { track, trigger, effect } from './effct.js'
+import { track, trigger } from './effect.js'
 
 
 

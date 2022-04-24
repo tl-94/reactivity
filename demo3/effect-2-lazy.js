@@ -3,26 +3,39 @@ const bucket = new WeakMap()
 // 用一个全局变量存储当前激活的 effect 函数
 let activeEffect
 // effect 栈
-const effectStack = [] // 新增
+const effectStack = []
 
-export function effect(fn) {
+export function effect(fn, options) {
     const effectFn = () => {
         cleanup(effectFn)
         // 当调用 effect 注册副作用函数时，将副作用函数复制给 activeEffect 
         activeEffect = effectFn
         // 在调用副作用函数之前将当前副作用函数压入栈中
-        effectStack.push(effectFn) // 新增
+        effectStack.push(effectFn)
         fn()
         // 在当前副作用函数执行完毕后，将当前副作用函数弹出栈，并把 activeEffect 还原为之前的值
-        effectStack.pop() // 新增
-        activeEffect = effectStack[effectStack.length - 1] // 新增
+        effectStack.pop()
+        activeEffect = effectStack[effectStack.length - 1]
     }
     // activeEffect.deps 用来存储所有与该副作用函数相关的依赖集合
     effectFn.deps = []
-    // 执行副作用函数
-    effectFn()
+    effectFn.options = effectFn;
+    if (options && !options.lazy) { // 新增
+        // 执行副作用函数
+        effectFn()
+    }
+    // 将副作用函数作为返回值返回
+    return effectFn // 新增
 }
-
+const state = reactive({
+    foo: 1
+})
+effect(() => {
+    console.log("a lazy effct run",state.foo)
+}, {
+    lazy:true, // false
+})
+state.foo = 2
 
 export function track(target, key) {
     // 没有 activeEffect，直接 return 
@@ -39,10 +52,8 @@ export function track(target, key) {
     deps.add(activeEffect)
     // deps 就是一个与当前副作用函数存在联系的依赖集合
     // 将其添加到 activeEffect.deps 数组中
-    activeEffect.deps.push(deps) // 新增
+    activeEffect.deps.push(deps)
 }
-
-
 export function trigger(target, key) {
     const depsMap = bucket.get(target)
     if (!depsMap) return
@@ -51,16 +62,21 @@ export function trigger(target, key) {
     const effectsToRun = new Set()
     effects && effects.forEach(effectFn => {
         // 如果 trigger 触发执行的副作用函数与当前正在执行的副作用函数相同，则不触发执行
-        if (effectFn !== activeEffect) { // 新增
+        if (effectFn !== activeEffect) {
             effectsToRun.add(effectFn)
         }
     })
-    effectsToRun.forEach(effectFn => effectFn())
-    // effects && effects.forEach(effectFn => effectFn()) 
+
+    effectsToRun.forEach(effectFn => {
+        // 如果一个副作用函数存在调度器，则调用该调度器，并将副作用函数作为参数传递
+        if (effectFn.options.scheduler) { // 新增
+            effectFn.options.scheduler(effectFn) // 新增
+        } else {
+            // 否则直接执行副作用函数（之前的默认行为）
+            effectFn() // 新增
+        }
+    })
 }
-
-
-
 function cleanup(effectFn) {
     // 遍历 effectFn.deps 数组
     for (let i = 0; i < effectFn.deps.length; i++) {
@@ -74,27 +90,10 @@ function cleanup(effectFn) {
 }
 
 
-function reactive(data) {
+export function reactive(data) {
     return new Proxy(data, {
         // 拦截读取操作
         get(target, key) {
-            // 没有 activeEffect，直接 return 
-            // if (!activeEffect) return
-            // // 根据 target 从“桶”中取得 depsMap，它也是一个 Map 类型：key --> effects 
-            // let depsMap = bucket.get(target)
-            // // 如果不存在 depsMap，那么新建一个 Map 并与 target 关联
-            // if (!depsMap) {
-            //     bucket.set(target, (depsMap = new Map()))
-            // }
-            // // 再根据 key 从 depsMap 中取得 deps，它是一个 Set 类型，
-            // // 里面存储着所有与当前 key 相关联的副作用函数：effects 
-            // let deps = depsMap.get(key)
-            // // 如果 deps 不存在，同样新建一个 Set 并与 key 关联
-            // if (!deps) {
-            //     depsMap.set(key, (deps = new Set()))
-            // }
-            // // 最后将当前激活的副作用函数添加到“桶”里
-            // deps.add(activeEffect)
             track(target, key)
             // 返回属性值
             return target[key]
@@ -103,17 +102,7 @@ function reactive(data) {
         set(target, key, newVal) {
             // 设置属性值
             target[key] = newVal
-            // 根据 target 从桶中取得 depsMap，它是 key --> effects 
-            // const depsMap = bucket.get(target)
-            // if (!depsMap) return
-            // 根据 key 取得所有副作用函数 effects 
-            // const effects = depsMap.get(key)
-            // console.log(effects, "key", key)
-            // // 执行副作用函数
-            // effects && effects.forEach(fn => fn())
-
             trigger(target, key)
-            //代表设置成功
             return true
         }
     })

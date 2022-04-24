@@ -1,12 +1,9 @@
 import { ref } from './ref.js'
-import { effect } from './effct.js'
+import { effect } from '../demo3/effct-lazy.js'
 
 const state = ref(false)
 
 effect(() => {
-    // if(state.ok){
-    //     console.log("effect ok is true; text: is", state.text)
-    // }
     console.log(state.value,"effect")
 })
 
