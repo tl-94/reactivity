@@ -1,4 +1,4 @@
-import { track, trigger, effect } from '../effct-lazy.js'
+import { track, trigger, effect } from '../demo3/effect-2-lazy.js'
 
 export function computed(getter) {
     let value
@@ -8,8 +8,9 @@ export function computed(getter) {
         lazy: true,
         scheduler() {
             if (!dirty) {
+                //当计算属性依赖的响应式数据变化时，代表需要重新计算
                 dirty = true
-                // 当计算属性依赖的响应式数据变化时，手动调用 trigger 函数触发响应
+                // 手动调用 trigger 函数触发响应
                 trigger(obj, 'value')
             }
         }

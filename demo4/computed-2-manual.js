@@ -19,7 +19,7 @@ export function computed(getter) {
             track(obj, 'value')
             // console.log("computed track")
 
-            return value
+            return value;
         }
     }
 

@@ -1,6 +1,6 @@
-import { computed } from "./computed-2-dirty.js";
-import { reactive } from "./reactive.js";
-import { effect } from '../effct-lazy.js'
+import { computed } from "./computed-3-dirty.js";
+// import { reactive } from "./reactive.js";
+import { effect,reactive } from '../demo3/effect-2-lazy.js'
 
 const state1 = reactive({
     foo: "foo"
@@ -28,6 +28,6 @@ setTimeout(() => {
 }, 1000);
 
 //如果值没发生改变，computed不用去重复计算
-setTimeout(() => {
-    console.log(comp.value,"access computed value")
-}, 3000);
+// setTimeout(() => {
+//     console.log(comp.value,"access computed value")
+// }, 3000);

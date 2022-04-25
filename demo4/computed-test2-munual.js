@@ -17,7 +17,7 @@ const comp = computed(() => {
 
 
 //3.在一个副作用函数内实现computed的值
-effect(() => {
+effect(function usecom(){
     console.log(comp.value,"access computed value")
 },{
     lazy: false
@@ -29,3 +29,15 @@ setTimeout(() => {
     //所以需要我们手动去track一下
     state2.bar = 'sss2'
 }, 1000);
+
+
+
+//尝试再加一个使用了computed的副作用函数
+effect(function usecom2(){
+    console.log(comp.value,"access computed value2")
+},{
+    lazy: false
+})
+//发现每次使用computed都会去重新计算一次，即便依赖的数据没有发生改变
+//显然重复计算是多余的，所以我们加入一个缓存的功能
+//见demo4/computed-3-dirty.js

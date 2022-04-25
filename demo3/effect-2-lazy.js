@@ -9,6 +9,8 @@ export function effect(fn, options) {
     const effectFn = () => {
         cleanup(effectFn)
         activeEffect = effectFn
+        activeEffect._name = fn.name
+
         effectStack.push(effectFn)
         //记住副作用函数的返回值
         let res = fn()
@@ -19,7 +21,7 @@ export function effect(fn, options) {
     }
     // activeEffect.deps 用来存储所有与该副作用函数相关的依赖集合
     effectFn.deps = []
-    effectFn.options = effectFn;
+    effectFn.options = options;
     if (options && !options.lazy) { // 新增
         // 执行副作用函数
         effectFn()
@@ -44,6 +46,7 @@ const effectFn = effect(() => {
 // state.foo = 3
 
 export function track(target, key) {
+    // console.log('acccc',activeEffect,)
     // 没有 activeEffect，直接 return 
     if (!activeEffect) return
     let depsMap = bucket.get(target)
